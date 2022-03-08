@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Service;
+use App\Helpers\ResponseFormatter;
 
 class ServiceController extends Controller
 {
@@ -14,8 +15,8 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::all(); 
-        return $services; 
+        $services = Service::all();
+        return $services;
     }
 
     /**
@@ -26,6 +27,13 @@ class ServiceController extends Controller
     public function create()
     {
         //
+        $request = new Service();
+        $request->name = "Meeting Room";
+        $request->space = 10.0;
+        $request->capacity = 10;
+        $request->description = "This is the unique meeting room";
+        $request->save();
+        redirect('service');
     }
 
     /**
@@ -36,7 +44,13 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $model = new Service();
+        $model->name = $request->name;
+        $model->space = $request->space;
+        $model->capacity = $request->capacity;
+        $model->description = $request->description;
+        $model->save();
+        redirect('service/');
     }
 
     /**
@@ -59,7 +73,8 @@ class ServiceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $model = Service::find($id);
+        return view('service.edit', compact('model'));
     }
 
     /**
@@ -72,17 +87,18 @@ class ServiceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'=>'required',
-            'cost'=>'required',
-            'image_url'=>'required',
-            'space'=>'required',
-            'capacity'=>'required',
+            'name' => 'required',
+            'space' => 'required',
+            'capacity' => 'required',
             'description',
-         ]);
-               
-         $post = Post::find($id)->update($request->all()); 
-                
-         return back()->with('success',' Data telah diperbaharui!');
+        ]);
+
+        $model = Service::find($id);
+        $model->name = $request->name;
+        $model->space = $request->space;
+        $model->capacity = $request->capacity;
+        $model->description = $request->description;
+        $model->save();
     }
 
     /**
@@ -93,6 +109,7 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $model = Service::find($id);
+        $model->delete();
     }
 }
