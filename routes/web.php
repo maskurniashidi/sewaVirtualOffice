@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,3 +20,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('service', ServiceController::class);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+});
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [RegisterController::class, 'store']);
+Route::post('/service', [ServiceController::class, 'store']);

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Service;
+use Illuminate\Support\Facades\Response;
 use App\Helpers\ResponseFormatter;
+use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
 class ServiceController extends Controller
 {
@@ -16,7 +18,10 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::all();
-        return $services;
+        return ResponseFormatter::success(
+            $services,
+            'Get services success'
+        );
     }
 
     /**
@@ -44,13 +49,34 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $model = new Service();
-        $model->name = $request->name;
-        $model->space = $request->space;
-        $model->capacity = $request->capacity;
-        $model->description = $request->description;
-        $model->save();
-        redirect('service/');
+        // $fields = $request->validate([
+        //     'name' => 'string|required',
+        //     'space' => 'double|required',
+        //     'capacity' => 'integer|required',
+        //     'description' => 'string',
+        // ]);
+
+        return $request;
+
+        // if (!$fields) {
+        //     return ResponseFormatter::error(
+        //         null,
+        //         'Invalid input.',
+        //         400
+        //     );
+        // }
+
+        // $service = Service::create([
+        //     'name' => $fields['name'],
+        //     'space' => $fields['space'],
+        //     'capacity' => $fields['capacity'],
+        //     'description' => $fields['description'],
+        // ]);
+
+        // return ResponseFormatter::success(
+        //     $service,
+        //     'New service created.'
+        // );
     }
 
     /**
@@ -62,7 +88,12 @@ class ServiceController extends Controller
     public function show($id)
     {
         $service = Service::findOrFail($id);
-        return $service;
+        if ($service) {
+            return ResponseFormatter::success(
+                $service,
+                'Get service success'
+            );
+        }
     }
 
     /**
