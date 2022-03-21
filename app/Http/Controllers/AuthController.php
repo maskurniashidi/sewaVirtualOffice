@@ -4,89 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Helpers\ResponseFormatter;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function register(Request $request)
     {
-        return $request;
-        // $validatedData = $request->validate([
-        //     'name' => 'required|max:255',
-        //     'email' => ['required', 'email:dns', 'unique:users'],
-        //     'password' => 'required|min:8|max:255',
-        // ]);
-
-        //return $validatedData;
+        //return  $request->password;
+        $validate = $request->validate([
+            "name" => 'required|max:255',
+            "email" => 'required|email:dns|unique:users',
+            'password' => 'required|min:8|max:255'
+        ]);
+        //enkripsi password
+        $validate["password"] = bcrypt($validate["password"]);
+        User::create($validate);
+        return ResponseFormatter::success(
+            $validate,
+            'New service created.'
+        );
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function login(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }
