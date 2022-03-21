@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\API\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/auth/register', [AuthController::class], 'register');
+
+Route::post('/service', [ServiceController::class, 'store']);
+Route::get('/service', [ServiceController::class, 'index']);
+Route::get('/service/{id}', [ServiceController::class, 'show']);
+Route::patch('/service/{id}', [ServiceController::class, 'update']);
+Route::delete('/service/{id}', [ServiceController::class, 'destroy']);

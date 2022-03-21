@@ -32,13 +32,7 @@ class ServiceController extends Controller
     public function create()
     {
         //
-        $request = new Service();
-        $request->name = "Meeting Room";
-        $request->space = 10.0;
-        $request->capacity = 10;
-        $request->description = "This is the unique meeting room";
-        $request->save();
-        redirect('service');
+
     }
 
     /**
@@ -49,34 +43,26 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        // $fields = $request->validate([
-        //     'name' => 'string|required',
-        //     'space' => 'double|required',
-        //     'capacity' => 'integer|required',
-        //     'description' => 'string',
-        // ]);
+        $fields = $request->validate([
+            'name' => 'string|required|max:255',
+            'space' => 'numeric|required',
+            'capacity' => 'integer|required',
+            'description' => 'string',
+        ]);
 
-        return $request;
+        //return $fields;
 
-        // if (!$fields) {
-        //     return ResponseFormatter::error(
-        //         null,
-        //         'Invalid input.',
-        //         400
-        //     );
-        // }
+        $service = Service::create([
+            'name' => $fields['name'],
+            'space' => $fields['space'],
+            'capacity' => $fields['capacity'],
+            'description' => $fields['description'],
+        ]);
 
-        // $service = Service::create([
-        //     'name' => $fields['name'],
-        //     'space' => $fields['space'],
-        //     'capacity' => $fields['capacity'],
-        //     'description' => $fields['description'],
-        // ]);
-
-        // return ResponseFormatter::success(
-        //     $service,
-        //     'New service created.'
-        // );
+        return ResponseFormatter::success(
+            $service,
+            'New service created.'
+        );
     }
 
     /**
@@ -104,8 +90,6 @@ class ServiceController extends Controller
      */
     public function edit($id)
     {
-        $model = Service::find($id);
-        return view('service.edit', compact('model'));
     }
 
     /**
@@ -117,19 +101,26 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'space' => 'required',
-            'capacity' => 'required',
-            'description',
+        $fields = $request->validate([
+            'name' => 'string|required|max:255',
+            'space' => 'numeric|required',
+            'capacity' => 'integer|required',
+            'description' => 'string',
         ]);
 
         $model = Service::find($id);
-        $model->name = $request->name;
-        $model->space = $request->space;
-        $model->capacity = $request->capacity;
-        $model->description = $request->description;
-        $model->save();
+        // return $model;
+        $model->update($fields);
+
+        if ($model) {
+            return ResponseFormatter::success(
+                $model,
+                'Service updated'
+            );
+        } else {
+            return ResponseFormatter::error(null, "Service failed to update", 400);
+        }
+        //return $fields;
     }
 
     /**
@@ -142,5 +133,10 @@ class ServiceController extends Controller
     {
         $model = Service::find($id);
         $model->delete();
+
+        return ResponseFormatter::success(
+            null,
+            'Serive deleted.'
+        );
     }
 }
