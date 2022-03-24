@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\PriceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +31,6 @@ Route::get('/service', [ServiceController::class, 'index']);
 Route::get('/service/{id}', [ServiceController::class, 'show']);
 Route::patch('/service/{id}', [ServiceController::class, 'update']);
 Route::delete('/service/{id}', [ServiceController::class, 'destroy']);
+
+Route::post('/image', [ImageController::class, 'store']);
+Route::post('/price', [PriceController::class, 'store']);

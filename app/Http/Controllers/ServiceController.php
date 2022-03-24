@@ -18,6 +18,8 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::all();
+        $services->load('images');
+        $services->load('prices');
         return ResponseFormatter::success(
             $services,
             'Get services success'
@@ -74,6 +76,8 @@ class ServiceController extends Controller
     public function show($id)
     {
         $service = Service::findOrFail($id);
+        $service->load('images');
+        $service->load('prices');
         if ($service) {
             return ResponseFormatter::success(
                 $service,

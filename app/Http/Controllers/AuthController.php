@@ -22,7 +22,7 @@ class AuthController extends Controller
         User::create($validate);
         return ResponseFormatter::success(
             $validate,
-            'New service created.'
+            'Your account has been registered'
         );
     }
     public function login(Request $request)
