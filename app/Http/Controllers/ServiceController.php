@@ -136,6 +136,9 @@ class ServiceController extends Controller
     public function destroy($id)
     {
         $model = Service::find($id);
+
+        $model->prices()->delete();
+        $model->images()->delete();
         $model->delete();
 
         return ResponseFormatter::success(
