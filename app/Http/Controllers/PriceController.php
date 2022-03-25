@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Price;
 use App\Helpers\ResponseFormatter;
+use App\Exceptions;
+use Throwable;
 
 class PriceController extends Controller
 {
@@ -72,7 +74,21 @@ class PriceController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $price = Price::findOrFail($id);
+            if ($price) {
+                return ResponseFormatter::success(
+                    $price,
+                    'success'
+                );
+            }
+        } catch (Throwable $e) {
+            report($e);
+            return ResponseFormatter::error(
+                report($e),
+                'Price not found'
+            );
+        }
     }
 
     /**
@@ -95,7 +111,25 @@ class PriceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $fields = $request->validate([
+            'price' => 'required|numeric',
+            'duration' => 'required|integer',
+            'unit' => 'required|string',
+            "service_id" => 'required',
+        ]);
+
+        $model = Price::find($id);
+        // return $model;
+        $model->update($fields);
+
+        if ($model) {
+            return ResponseFormatter::success(
+                $model,
+                'Price updated'
+            );
+        } else {
+            return ResponseFormatter::error(null, "Price failed to update", 400);
+        }
     }
 
     /**
@@ -106,6 +140,21 @@ class PriceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $price = Price::findOrFail($id);
+            $price->delete();
+            if ($price) {
+                return ResponseFormatter::success(
+                    null,
+                    'Price deleted'
+                );
+            }
+        } catch (Throwable $e) {
+            report($e);
+            return ResponseFormatter::error(
+                report($e),
+                'Price not found, cannot delete'
+            );
+        }
     }
 }

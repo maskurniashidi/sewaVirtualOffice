@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Image;
 use App\Helpers\ResponseFormatter;
+use Exception;
 
 class ImageController extends Controller
 {
@@ -70,7 +71,21 @@ class ImageController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $image = Image::findOrFail($id);
+            if ($image) {
+                return ResponseFormatter::success(
+                    $image,
+                    'success'
+                );
+            }
+        } catch (Exception $e) {
+            report($e);
+            return ResponseFormatter::error(
+                report($e),
+                'Image not found'
+            );
+        }
     }
 
     /**
@@ -93,7 +108,26 @@ class ImageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $fields = $request->validate([
+            'image_url' => 'required|string',
+            'description' => 'string',
+            'service_id' => 'required',
+        ]);
+
+        if (!$fields) {
+            return ResponseFormatter::error(
+                null,
+                'Invalid input',
+                400
+            );
+        } else {
+            $model = Image::find($id);
+            $model->update($fields);
+            return ResponseFormatter::success(
+                $model,
+                'Image updated'
+            );
+        }
     }
 
     /**
@@ -104,6 +138,19 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $image = Image::findOrFail($id);
+            $image->delete();
+            return ResponseFormatter::success(
+                null,
+                'Image deleted'
+            );
+        } catch (Exception $e) {
+            report($e);
+            return ResponseFormatter::error(
+                report($e),
+                'Image can not deleted'
+            );
+        }
     }
 }

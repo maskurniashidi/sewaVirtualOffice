@@ -33,4 +33,12 @@ Route::patch('/service/{id}', [ServiceController::class, 'update']);
 Route::delete('/service/{id}', [ServiceController::class, 'destroy']);
 
 Route::post('/image', [ImageController::class, 'store']);
+Route::patch('/image/{id}', [ImageController::class, 'update']);
+Route::get('/image/{id}', [ImageController::class, 'show']);
+Route::delete('/image/{id}', [ImageController::class, 'destroy']);
+
+
 Route::post('/price', [PriceController::class, 'store']);
+Route::patch('/price/{id}', [PriceController::class, 'update']);
+Route::get('/price/{id}', [PriceController::class, 'show']);
+Route::delete('/price/{id}', [PriceController::class, 'destroy']);
