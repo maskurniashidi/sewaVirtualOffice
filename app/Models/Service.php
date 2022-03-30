@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Image;
 use App\Models\Price;
+use App\Models\Facility;
 
 class Service extends Model
 {
@@ -23,5 +24,9 @@ class Service extends Model
     public function prices()
     {
         return $this->hasMany(Price::class);
+    }
+    public function facilities()
+    {
+        return $this->belongsToMany(Facility::class, 'facilities_services');
     }
 }

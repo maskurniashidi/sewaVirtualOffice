@@ -20,6 +20,7 @@ class ServiceController extends Controller
         $services = Service::all();
         $services->load('images');
         $services->load('prices');
+        $services->load('facilities');
         return ResponseFormatter::success(
             $services,
             'Get services success'
@@ -78,6 +79,7 @@ class ServiceController extends Controller
         $service = Service::findOrFail($id);
         $service->load('images');
         $service->load('prices');
+        $service->load('facilities');
         if ($service) {
             return ResponseFormatter::success(
                 $service,
