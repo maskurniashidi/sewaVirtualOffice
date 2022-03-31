@@ -8,6 +8,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityServiceController;
+use App\Http\Controllers\RentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -53,3 +54,8 @@ Route::get('/facility-service/{id}', [FacilityServiceController::class, 'show'])
 Route::post('/facility-service', [FacilityServiceController::class, 'store']);
 Route::patch('/facility-service/{id}', [FacilityServiceController::class, 'update']);
 Route::delete('/facility-service/{id}', [FacilityServiceController::class, 'destroy']);
+
+Route::get('/rent/{id}', [RentController::class, 'show']);
+Route::post('/rent', [RentController::class, 'store']);
+Route::patch('/rent/{id}', [RentController::class, 'update']);
+Route::delete('/rent/{id}', [RentController::class, 'destroy']);

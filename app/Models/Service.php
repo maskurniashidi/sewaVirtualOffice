@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Image;
 use App\Models\Price;
 use App\Models\Facility;
+use App\Models\Rent;
 
 class Service extends Model
 {
@@ -28,5 +29,13 @@ class Service extends Model
     public function facilities()
     {
         return $this->belongsToMany(Facility::class, 'facilities_services');
+    }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'rent');
+    }
+    public function rents()
+    {
+        return $this->hasMany(Rent::class);
     }
 }

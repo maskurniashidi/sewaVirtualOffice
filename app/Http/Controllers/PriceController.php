@@ -5,51 +5,35 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Price;
 use App\Helpers\ResponseFormatter;
-use App\Exceptions;
+use App\Models\Service;
+use Exception;
 use Throwable;
 
 class PriceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $fields = $request->validate([
-            'price' => 'required|numeric',
-            'duration' => 'required|integer',
-            'unit' => 'required|string',
-            "service_id" => 'required',
-        ]);
-
-        if (!$fields) {
+        try {
+            $fields = $request->validate([
+                'price' => 'required|numeric',
+                'duration' => 'required|integer',
+                'unit' => 'required|string',
+                "service_id" => 'required',
+            ]);
+        } catch (Exception $e) {
             return ResponseFormatter::error(
                 null,
-                'Invalid input',
-                400
+                'Invalid input'
+            );
+        }
+
+        try {
+            Service::findOrFail($fields["service_id"]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                null,
+                'Service id not found, can not add the price'
             );
         }
 
@@ -59,29 +43,16 @@ class PriceController extends Controller
             'unit' => $fields['unit'],
             'service_id' => $fields['service_id']
         ]);
-
         return ResponseFormatter::success(
             $growth,
             'New price added'
         );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         try {
             $price = Price::findOrFail($id);
-            if ($price) {
-                return ResponseFormatter::success(
-                    $price,
-                    'success'
-                );
-            }
         } catch (Throwable $e) {
             report($e);
             return ResponseFormatter::error(
@@ -89,66 +60,52 @@ class PriceController extends Controller
                 'Price not found'
             );
         }
+        return ResponseFormatter::success(
+            $price,
+            'success'
+        );
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $fields = $request->validate([
-            'price' => 'required|numeric',
-            'duration' => 'required|integer',
-            'unit' => 'required|string',
-            "service_id" => 'required',
-        ]);
-
-        $model = Price::find($id);
-        // return $model;
-        $model->update($fields);
-
-        if ($model) {
-            return ResponseFormatter::success(
-                $model,
-                'Price updated'
+        try {
+            $fields = $request->validate([
+                'price' => 'required|numeric',
+                'duration' => 'required|integer',
+                'unit' => 'required|string',
+                "service_id" => 'required',
+            ]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                null,
+                'Invalid input'
             );
-        } else {
-            return ResponseFormatter::error(null, "Price failed to update", 400);
         }
+        try {
+            $model = Price::findOrFail($id);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, "Price id not found, failed to update");
+        }
+        try {
+            Service::findOrFail($fields["service_id"]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                null,
+                'Service id not found, can not add the price'
+            );
+        }
+
+        $model->update($fields);
+        return ResponseFormatter::success(
+            $model,
+            'Price updated'
+        );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         try {
             $price = Price::findOrFail($id);
             $price->delete();
-            if ($price) {
-                return ResponseFormatter::success(
-                    null,
-                    'Price deleted'
-                );
-            }
         } catch (Throwable $e) {
             report($e);
             return ResponseFormatter::error(
@@ -156,5 +113,9 @@ class PriceController extends Controller
                 'Price not found, cannot delete'
             );
         }
+        return ResponseFormatter::success(
+            null,
+            'Price deleted'
+        );
     }
 }

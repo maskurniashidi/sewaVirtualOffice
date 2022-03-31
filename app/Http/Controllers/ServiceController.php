@@ -7,14 +7,11 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Response;
 use App\Helpers\ResponseFormatter;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
+use Exception;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         $services = Service::all();
@@ -27,33 +24,18 @@ class ServiceController extends Controller
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $fields = $request->validate([
-            'name' => 'string|required|max:255',
-            'space' => 'numeric|required',
-            'capacity' => 'integer|required',
-            'description' => 'string',
-        ]);
-
-        //return $fields;
+        try {
+            $fields = $request->validate([
+                'name' => 'string|required|max:255',
+                'space' => 'numeric|required',
+                'capacity' => 'integer|required',
+                'description' => 'nullable|string',
+            ]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'Invalid Input');
+        }
 
         $service = Service::create([
             'name' => $fields['name'],
@@ -68,80 +50,56 @@ class ServiceController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $service = Service::findOrFail($id);
+        try {
+            $service = Service::findOrFail($id);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'Service not found');
+        }
         $service->load('images');
         $service->load('prices');
         $service->load('facilities');
-        if ($service) {
-            return ResponseFormatter::success(
-                $service,
-                'Get service success'
-            );
-        }
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
+        return ResponseFormatter::success(
+            $service,
+            'Get service success'
+        );
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $fields = $request->validate([
-            'name' => 'string|required|max:255',
-            'space' => 'numeric|required',
-            'capacity' => 'integer|required',
-            'description' => 'string',
-        ]);
-
-        $model = Service::find($id);
-        // return $model;
-        $model->update($fields);
-
-        if ($model) {
-            return ResponseFormatter::success(
-                $model,
-                'Service updated'
-            );
-        } else {
-            return ResponseFormatter::error(null, "Service failed to update", 400);
+        try {
+            $fields = $request->validate([
+                'name' => 'string|required|max:255',
+                'space' => 'numeric|required',
+                'capacity' => 'integer|required',
+                'description' => 'nullable|string',
+            ]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'Invalid Input');
         }
-        //return $fields;
+        try {
+            $model = Service::findOrFail($id);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'Service id not found');
+        }
+        $model->update($fields);
+        return ResponseFormatter::success(
+            $model,
+            'Service updated'
+        );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $model = Service::find($id);
-
-        $model->prices()->delete();
-        $model->images()->delete();
-        $model->delete();
+        try {
+            $service = Service::findOrFail($id);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'Service id not found');
+        }
+        $service->prices()->delete();
+        $service->images()->delete();
+        $service->delete();
 
         return ResponseFormatter::success(
             null,

@@ -15,10 +15,6 @@ class Facility extends Model
     ];
     public function services()
     {
-        return $this->belongsToMany(Service::class, '');
-    }
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'facilities_services');
+        return $this->belongsToMany(Service::class, 'facilities_services');
     }
 }
