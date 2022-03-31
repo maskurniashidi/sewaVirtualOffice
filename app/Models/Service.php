@@ -34,8 +34,8 @@ class Service extends Model
     {
         return $this->belongsToMany(User::class, 'rent');
     }
-    public function rents()
+    public function rent()
     {
-        return $this->hasMany(Rent::class);
+        return $this->belongsTo(Rent::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\PriceController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityServiceController;
 use App\Http\Controllers\RentController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -59,3 +60,5 @@ Route::get('/rent/{id}', [RentController::class, 'show']);
 Route::post('/rent', [RentController::class, 'store']);
 Route::patch('/rent/{id}', [RentController::class, 'update']);
 Route::delete('/rent/{id}', [RentController::class, 'destroy']);
+
+Route::get('/user/history/{id}', [UserController::class, 'getRentHistory']);
