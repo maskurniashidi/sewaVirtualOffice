@@ -6,22 +6,59 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Helpers\ResponseFormatter;
+use Exception;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        //return  $request->password;
-        $validate = $request->validate([
-            "name" => 'required|max:255',
-            "email" => 'required|email:dns|unique:users',
-            'password' => 'required|min:8|max:255'
+        try {
+            $fields = $request->validate([
+                "name" => 'required|max:255',
+                "email" => 'required|email:dns|unique:users',
+                'password' => 'required|min:8|max:255',
+            ]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                null,
+                'Invalid input, your email has benn registered or your password less than 8 character'
+            );
+        }
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+            'is_admin' => false,
         ]);
-        //enkripsi password
-        $validate["password"] = bcrypt($validate["password"]);
-        User::create($validate);
         return ResponseFormatter::success(
-            $validate,
+            $user,
+            'Your account has been registered'
+        );
+    }
+
+    public function registerAdmin(Request $request)
+    {
+        try {
+            $fields = $request->validate([
+                "name" => 'required|max:255',
+                "email" => 'required|email:dns|unique:users',
+                'password' => 'required|min:8|max:255',
+            ]);
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                null,
+                'Invalid input, your email has benn registered or your password less than 8 character'
+            );
+        }
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+            'is_admin' => true,
+        ]);
+
+        return ResponseFormatter::success(
+            $user,
             'Your account has been registered'
         );
     }
