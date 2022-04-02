@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Service;
-use Illuminate\Support\Facades\Response;
 use App\Helpers\ResponseFormatter;
-use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 use Exception;
+use Validator;
 
 class ServiceController extends Controller
 {
-
     public function index()
     {
         $services = Service::all();
@@ -26,24 +24,28 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $fields = $request->validate([
-                'name' => 'string|required|max:255',
-                'space' => 'numeric|required',
-                'capacity' => 'integer|required',
-                'description' => 'nullable|string',
-            ]);
-        } catch (Exception $e) {
-            return ResponseFormatter::error(null, 'Invalid Input');
-        }
-
-        $service = Service::create([
-            'name' => $fields['name'],
-            'space' => $fields['space'],
-            'capacity' => $fields['capacity'],
-            'description' => $fields['description'],
+        $validator = Validator::make($request->all(),[
+            'name' => 'string|required|max:255',
+            'space' => 'numeric|required',
+            'capacity' => 'integer|required',
+            'description' => 'nullable|string',
         ]);
-
+        if($validator->fails()){
+            return response()->json($validator->errors());       
+        }
+        try{
+            $service = Service::create([
+                'name' => $request->name,
+                'space' => $request->space,
+                'capacity' => $request->capacity,
+                'description' => $request->description,
+            ]);
+        }catch(Exception $e){
+            return ResponseFormatter::error(
+                report($e),
+                'Failed to create new service'
+            );
+        }
         return ResponseFormatter::success(
             $service,
             'New service created.'
@@ -68,22 +70,27 @@ class ServiceController extends Controller
     }
     public function update(Request $request, $id)
     {
-        try {
-            $fields = $request->validate([
-                'name' => 'string|required|max:255',
-                'space' => 'numeric|required',
-                'capacity' => 'integer|required',
-                'description' => 'nullable|string',
-            ]);
-        } catch (Exception $e) {
-            return ResponseFormatter::error(null, 'Invalid Input');
+        $validator = Validator::make($request->all(),[
+            'name' => 'string|required|max:255',
+            'space' => 'numeric|required',
+            'capacity' => 'integer|required',
+            'description' => 'nullable|string',
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors());       
         }
         try {
             $model = Service::findOrFail($id);
+            $fields =[
+                'name' => $request->name,
+                'space'=>$request->space,
+                'capacity'=>$request->capacity,
+                'description'=>$request->description,
+            ];
+            $model->update($fields);
         } catch (Exception $e) {
             return ResponseFormatter::error(null, 'Service id not found');
         }
-        $model->update($fields);
         return ResponseFormatter::success(
             $model,
             'Service updated'
@@ -103,7 +110,7 @@ class ServiceController extends Controller
 
         return ResponseFormatter::success(
             null,
-            'Serive deleted.'
+            'Service deleted.'
         );
     }
 }

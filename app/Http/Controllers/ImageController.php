@@ -79,7 +79,7 @@ class ImageController extends Controller
             $image = Image::findOrFail($id);
         } catch (Exception $e) {
             report($e);
-            return ResponseFormatter::error(null, 'Image can not deleted');
+            return ResponseFormatter::error(null, 'Image id not found, image can not deleted');
         }
         $image->delete();
         return ResponseFormatter::success('Image deleted');

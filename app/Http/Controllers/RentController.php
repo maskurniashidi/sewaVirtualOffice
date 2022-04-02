@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use App\Models\Rent;
 use App\Models\Service;
+use App\Models\User;
 use App\Http\Controllers\ServiceController;
 use Exception;
 
@@ -14,7 +15,10 @@ class RentController extends Controller
 
     public function index()
     {
-        //
+        $rents = Rent::all();
+        $rents->load('service');
+        $rents->load('user');
+        return $rents;
     }
 
     public function store(Request $request)
@@ -91,5 +95,26 @@ class RentController extends Controller
             null,
             'The rent data was deleted'
         );
+    }
+    public function getRentHistory($id)
+    {
+        $user= User::findOrFail($id);
+        try {
+            $rents = Rent::all()->where('user_id',$id);
+            $rents->load('service');
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, 'User have not any data');
+        }
+        return ['user'=> $user,'rents'=>$rents];
+    }
+
+    public function destroy($id){
+        try{
+            $rent = Rent::findOrFail($id);
+        }catch(Exception $e){
+            return ResponseFormatter::error(null,'Rent id not found, Rent can not delete');
+        }
+        $rent->delete();
+        return ResponseFormatter::success(null,'Rent deleted');
     }
 }
