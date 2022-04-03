@@ -38,14 +38,20 @@ class RentController extends Controller
             );
         }
         try {
-            $price = Service::findOrFail($fields["service_id"])->prices->where('duration', $fields["duration"]);
+            $prices = Service::findOrFail($fields["service_id"])->prices->where('duration', $fields["duration"]);
+            $price = $prices[0]->price;
+        } catch (Exception $e) {
+            $prices = Service::findOrFail($fields["service_id"])->prices->where('duration', 1);
+            $price = $prices[0]->price * $fields['duration'];
+        }
+        try {
             $rent = Rent::create([
                 'service_id' => $fields['service_id'],
                 'user_id' => $fields['user_id'],
                 'rentalStart' => $fields['rentalStart'],
                 'rentalEnd' => $fields['rentalEnd'],
                 'duration' => $fields['duration'],
-                'totalPayment' => $price[0]->price,
+                'totalPayment' => $price,
             ]);
         } catch (Exception $e) {
             return ResponseFormatter::error(
