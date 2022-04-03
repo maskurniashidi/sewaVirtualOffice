@@ -9,7 +9,6 @@ use App\Http\Controllers\PriceController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityServiceController;
 use App\Http\Controllers\RentController;
-use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -37,7 +36,7 @@ Route::get('/facility-service/{id}', [FacilityServiceController::class, 'show'])
 
 //Route yang bisa diakses oleh user(pembeli) yang sudah login
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/profile', function(Request $request) {
+    Route::get('/profile', function (Request $request) {
         return auth()->user();
     });
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
@@ -48,7 +47,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/rent/{id}', [RentController::class, 'destroy']);
 
     Route::get('/user/history/{id}', [RentController::class, 'getRentHistory']);
-    
 });
 
 //Route yang bisa diakses oleh admin yang sudah login
@@ -75,4 +73,3 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::get('/rent', [RentController::class, 'index']);
 });
-

@@ -37,7 +37,6 @@ class RentController extends Controller
                 'Invalid input'
             );
         }
-
         try {
             $price = Service::findOrFail($fields["service_id"])->prices->where('duration', $fields["duration"]);
             $rent = Rent::create([
@@ -98,23 +97,13 @@ class RentController extends Controller
     }
     public function getRentHistory($id)
     {
-        $user= User::findOrFail($id);
+        $user = User::findOrFail($id);
         try {
-            $rents = Rent::all()->where('user_id',$id);
+            $rents = Rent::all()->where('user_id', $id);
             $rents->load('service');
         } catch (Exception $e) {
             return ResponseFormatter::error(null, 'User have not any data');
         }
-        return ['user'=> $user,'rents'=>$rents];
-    }
-
-    public function destroy($id){
-        try{
-            $rent = Rent::findOrFail($id);
-        }catch(Exception $e){
-            return ResponseFormatter::error(null,'Rent id not found, Rent can not delete');
-        }
-        $rent->delete();
-        return ResponseFormatter::success(null,'Rent deleted');
+        return ['user' => $user, 'rents' => $rents];
     }
 }
