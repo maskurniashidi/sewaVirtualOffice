@@ -9,6 +9,8 @@ use App\Models\Service;
 use App\Models\User;
 use App\Http\Controllers\ServiceController;
 use Exception;
+use Auth;
+use Response;
 
 class RentController extends Controller
 {
@@ -21,6 +23,37 @@ class RentController extends Controller
         return $rents;
     }
 
+    public function storeMany(Request $request)
+    {
+        $myRent = [];
+        $total = 0;
+        foreach ($request->rents as $data) {
+            $rent = new Rent();
+            $rent->service_id = $data['service_id'];
+            $rent->user_id = $data['user_id'];
+            $rent->rentalStart = $data['rentalStart'];
+            $rent->rentalEnd = $data['rentalEnd'];
+            $rent->duration = $data['duration'];
+
+            try {
+                $prices = Service::findOrFail($rent->service_id)->prices->where('duration', $rent->duration);
+                $price = $prices[0]->price;
+            } catch (Exception $e) {
+                $prices = Service::findOrFail($rent->service_id)->prices->where('duration', 1);
+                $price = $prices[0]->price * $rent->duration;
+            }
+            $rent->totalPayment = $price;
+            $rent->save();
+            $total += $price;
+            $rent->service;
+            $myRent = array(...$myRent, $rent);
+        }
+        return Response::json(array(
+            'message' => "Data Successfully Added",
+            'rents' => $myRent,
+            'total' => $total,
+        ), 200);
+    }
     public function store(Request $request)
     {
         try {

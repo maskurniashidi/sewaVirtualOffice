@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/rent/{id}', [RentController::class, 'show']);
     Route::post('/rent', [RentController::class, 'store']);
+    Route::post('/rents', [RentController::class, 'storeMany']);
     Route::patch('/rent/{id}', [RentController::class, 'update']);
     Route::delete('/rent/{id}', [RentController::class, 'destroy']);
 
